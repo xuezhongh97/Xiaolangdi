@@ -17,59 +17,63 @@ import random as rd
 from PIL import Image, ImageDraw, ImageFont
 
 fast_normal_timetable=[]
-for i in range(5*60,24*60,6):
+for i in range(5*60,22*60,6):
     fast_normal_timetable.append(i)
-for i in range(7*60+3,9*60+3,6):
+for i in range(22*60,24*60,12):
+    fast_normal_timetable.append(i)    
+for i in range(7*60+3,9*60,6):
     fast_normal_timetable.append(i)
-for i in range(17*60+3,19*60+3,6):
+for i in range(17*60+3,19*60,6):
     fast_normal_timetable.append(i)
 for i in range(0*60,5*60,30):
     fast_normal_timetable.append(i)
 fast_normal_timetable.sort()
 
 main_normal_timetable=[]
-for i in range(5*60,24*60,10):
+for i in range(5*60,22*60,10):
     main_normal_timetable.append(i)
-for i in range(7*60+5,9*60+5,10):
+for i in range(22*60,24*60,20):
     main_normal_timetable.append(i)
-for i in range(17*60+5,19*60+5,10):
+for i in range(7*60+5,9*60,10):
+    main_normal_timetable.append(i)
+for i in range(17*60+5,19*60,10):
     main_normal_timetable.append(i)
 for i in range(0*60,5*60,30):
     main_normal_timetable.append(i)
 main_normal_timetable.sort()
 
 slow_normal_timetable=[]
-for i in range(5*60,22*60+3,20):
+for i in range(5*60,23*60+1,20):
     slow_normal_timetable.append(i)
-for i in range(7*60+10,9*60+10,20):
+for i in range(7*60+10,9*60,20):
     slow_normal_timetable.append(i)
-for i in range(17*60+10,19*60+10,20):
+for i in range(17*60+10,19*60,20):
     slow_normal_timetable.append(i)
 slow_normal_timetable.sort()
 
 long_normal_timetable=[]
-for i in range(7*60,21*60+3,40):
+for i in range(5*60,22*60+1,40):
     long_normal_timetable.append(i)
-for i in range(7*60+20,9*60+20,40):
+for i in range(7*60+20,9*60,40):
     long_normal_timetable.append(i)
-for i in range(17*60+20,19*60+20,40):
+for i in range(17*60+20,19*60,40):
     long_normal_timetable.append(i)
 long_normal_timetable.sort()
 
 fast_sunday_timetable=[]
-for i in range(7*60,21*60+1,9):
+for i in range(7*60,23*60+1,9):
     fast_sunday_timetable.append(i)
 
 middle_sunday_timetable=[]
-for i in range(7*60,21*60+1,15):
+for i in range(7*60,22*60+1,15):
     middle_sunday_timetable.append(i)
 
 slow_sunday_timetable=[]
-for i in range(8*60,20*60+1,30):
+for i in range(7*60,21*60+1,30):
     slow_sunday_timetable.append(i)
 
 long_sunday_timetable=[]
-for i in range(8*60,19*60+1,60):
+for i in range(7*60,20*60+1,60):
     long_sunday_timetable.append(i)
 
 list_station=[]
@@ -148,8 +152,8 @@ class busline:
             for n in list_station:
                 if m==n.get_name():
                     if connectiontemp2==1:
-                        print("|")
-                    print(n.get_zone()," ",m)
+                        pass#print("|")                        
+                    print("*",n.get_zone()," ",m)
                     connectiontemp2=1
         print("平均每站",self.__time,"分钟")
         self.affichage_timetable()
@@ -232,24 +236,24 @@ class Station:
                     liste_de_line=j.get_station()
                     for k in liste_de_line:
                         if k!=self.get_name():
-                            self.__neighborhood.append((k,j.get_time()*abs(liste_de_line.index(k)-liste_de_line.index(self.get_name()))))
+                            self.__neighborhood.append((k,j.get_time()*abs(liste_de_line.index(k)-liste_de_line.index(self.get_name())),j.get_numero()))
         self.__neighborhoodsorted=sorted(self.__neighborhood, key=lambda s: s[-1])
         for i in self.__line:
             for j in list_line:
                 if i==j.get_numero():
-                    direction=j.get_station()[-1]
+                    direction=j.get_station()[0]
                     delay=j.get_time()*abs(len(j.get_station())-j.get_station().index(self.get_name()))
                     timetableexact=[]
                     for i in j.get_timetable():
                         timetableexact.append(i+delay)
                     self.__timetable.append((j.get_numero(),direction,timetableexact))
-                    direction=j.get_station()[0]
+                    direction=j.get_station()[-1]
                     delay=j.get_time()*abs(0-j.get_station().index(self.get_name()))
                     timetableexact=[]
                     for i in j.get_timetable():
                         timetableexact.append(i+delay)
                     self.__timetable.append((j.get_numero(),direction,timetableexact))
-                    
+  
     def get_neighbor(self):
         return self.__neighborhoodsorted
     
@@ -283,7 +287,10 @@ def is_week_lastday():
 
     
 def searchline():
-    line=int(input("线路号\n"))
+    try:
+        line=int(input("线路号\n"))
+    except ValueError:
+        print("")
     os.system("clear")    
     for i in list_line:
         if line==i.get_numero():
@@ -300,10 +307,10 @@ def searchstation():
 def drawline(station1,station2,line):
     global linemap
     for i in list_station:
-        if station1==i.get_name():
+        if station1==i.get_name() or station1==i.get_shortname():
             Station1=i
     for i in list_station:
-        if station2==i.get_name():
+        if station2==i.get_name() or station1==i.get_shortname():
             Station2=i
     n1,y1,x1,z1=Station1.get_position()
     n2,y2,x2,z1=Station2.get_position()
@@ -328,107 +335,144 @@ def drawpoint(station,line,isblackened):
     draw = ImageDraw.Draw(img_PIL)
     draw.text(position, str, font=font, fill=fillColor)
     linemap = cv.cvtColor(np.asarray(img_PIL),cv.COLOR_RGB2BGR)
-
-
-def searchroute(startstation,endstation,timenow1,ticketflag):
+    
+def searchroute(startstation,endstation,line,timenow1,ticketflag):
+    stations=[]
     for i in list_station:
         if startstation==i.get_name() or startstation==i.get_shortname():
             stationstarted=i
         if endstation==i.get_name() or endstation==i.get_shortname():
             stationended=i
-    for i in stationstarted.get_line():
-        mintime=3000
-        for j in list_line:
-            if i==j.get_numero():
-                linetemp=j
-                found=0
-                for k in linetemp.get_station():
-                    if k==startstation:
-                        stationnum1=linetemp.get_station().index(k)
-                    if k==endstation:
-                        stationnum2=linetemp.get_station().index(k)
-                        found=1                
-                if found==1:
-                   
-                    if stationnum1<=stationnum2:
-                        direction=linetemp.get_station()[-1]
-                    else:
-                        direction=linetemp.get_station()[0]
-                    timetable=stationstarted.give_timetable() 
-                    for i in timetable:
-                        if i[0]==linetemp.get_numero() and i[1]==direction:
-                            for m in i[-1]:
-                                time_rest=m-timenow1
-                                if time_rest>=0:
-                                    break
-                    if time_rest>=0 and time_rest<=120:
-                        print(linetemp.get_numero(),"路","(",direction,")","+",int(time_rest),"分")
-                        connectiontemp=0
-                        if stationnum1<=stationnum2:
-                            for j in range(stationnum1,stationnum2+1):
-                                for l in list_station:
-                                    if linetemp.get_station()[j]==l.get_name():
-                                        if connectiontemp==1:
-                                            print("|")
-                                        ticketflag.append(l.get_zone())
-                                        print(l.get_zone()," ",l.get_name())
-                                        connectiontemp=1
+    mintime=3000
+    for j in list_line:
+        if line==j.get_numero():
+            linetemp=j
+            found=0
+            circle=0
+            if linetemp.get_station()[1]==linetemp.get_station()[-1]:
+                circle=1
+            for k in linetemp.get_station():
+                if k==stationstarted.get_name():
+                    stationnum1=linetemp.get_station().index(k)
+                if k==stationended.get_name():
+                    stationnum2=linetemp.get_station().index(k)
+                    found=1                
+            if found==1:
+                if stationnum1<=stationnum2:
+                    direction=linetemp.get_station()[-1]
+                else:
+                    direction=linetemp.get_station()[0]
+                if circle:
+                    if stationnum1==1:
+                        if abs(stationnum2-1)>abs(len(linetemp.get_station())-stationnum2):
+                            direction=linetemp.get_station()[-1]
+                            stationnum1=len(linetemp.get_station())-1
                         else:
-                            for j in range(stationnum1,stationnum2-1,-1):
-                                for l in list_station:
-                                    if linetemp.get_station()[j]==l.get_name():
-                                        if connectiontemp==1:
-                                            print("|")                                        
-                                        ticketflag.append(l.get_zone())
-                                        print(l.get_zone()," ",l.get_name())
-                                        connectiontemp=1                                        
-                            
-                        print("\n正点到达时间 ",int(abs(stationnum1-stationnum2)*linetemp.get_time()+time_rest+timenow1)//60,"时",int(abs(stationnum1-stationnum2)*linetemp.get_time()+time_rest+timenow1)%60,"分")
-                        mintime=min(mintime,abs(stationnum1-stationnum2)*linetemp.get_time()+time_rest+timenow1)
-                    else :
-                        print("车辆停止运营")
-                    if stationnum1<=stationnum2:
-                        for i in range(stationnum1,stationnum2):
-                            drawline(linetemp.get_station()[i],linetemp.get_station()[i+1],linetemp)
-                        for i in range(stationnum1,stationnum2+1):
-                            if i == stationnum1 or i == stationnum2:
-                                drawpoint(linetemp.get_station()[i],linetemp,1)
-                            else:
-                                drawpoint(linetemp.get_station()[i],linetemp,0)
+                            direction=linetemp.get_station()[0]
+                    if stationnum2==1:
+                        if abs(stationnum1-1)>abs(len(linetemp.get_station())-stationnum1):
+                            print("debug")                        
+                            direction=linetemp.get_station()[-1]
+                            stationnum2=len(linetemp.get_station())-1
+                        else:
+                            direction=linetemp.get_station()[0]
 
+                timetable=stationstarted.give_timetable() 
+                for i in timetable:
+                    if i[0]==linetemp.get_numero() and i[1]==direction:
+                        for m in i[-1]:
+                            time_rest=m-timenow1
+                            if time_rest>=0:
+                                break
+                if time_rest>=0 and time_rest<=120:
+                    if stationnum1<=stationnum2:
+                        for j in range(stationnum1,stationnum2+1):
+                            for l in list_station:
+                                if linetemp.get_station()[j]==l.get_name():
+                                    stations.append(l.get_name())
+                                    ticketflag.append(l.get_zone())
                     else:
-                        for i in range(stationnum2,stationnum1):
-                            drawline(linetemp.get_station()[i],linetemp.get_station()[i+1],linetemp)
-                        for i in range(stationnum2,stationnum1+1):
-                            if i == stationnum1 or i == stationnum2:
-                                drawpoint(linetemp.get_station()[i],linetemp,1)
-                            else:
-                                drawpoint(linetemp.get_station()[i],linetemp,0)                         
-                    return mintime
-                        
-def searchcomplex(stationended,stationstarted,ordre,route):
-    routetemp=route.copy()
-    if ordre>4:
-        return False
-    if stationended==stationstarted:
-        return route
-    for i in stationended.get_neighbor():
+                        for j in range(stationnum1,stationnum2-1,-1):
+                            for l in list_station:
+                                if linetemp.get_station()[j]==l.get_name():
+                                    stations.append(l.get_name())                                   
+                                    ticketflag.append(l.get_zone())
+                    mintime=min(mintime,abs(stationnum1-stationnum2)*linetemp.get_time()+time_rest+timenow1)
+                else:
+                    print("车辆停止运营")
+                    return 0
+                return (startstation,endstation,timenow1,time_rest,timenow1+time_rest,stations,abs(stationnum1-stationnum2)*linetemp.get_time()+time_rest+timenow1,line,direction,ticketflag)
+    return 0
+            
+def search1(stationstarted,stationended,route):
+    goal=stationended.get_name()
+    for i in stationstarted.get_neighbor():
+        if i[0]==goal:
+            poids=i[1]
+            route.append((1,i[2],poids))
+    return route
+                
+
+def search2(stationstarted,stationended,route):
+    goal=stationended.get_name()
+    for i in stationstarted.get_neighbor():
         for j in list_station:
-            if j.get_name()==i[0]:
-                route=routetemp.copy()
-                route.append(j.get_name())
-                routereturn=searchcomplex(j,stationstarted,ordre+1,route)
-                if routereturn!=False:
-                    return routereturn
-    return False
+            if i[0]==j.get_name():
+                for k in j.get_neighbor():
+                    if k[0]==goal:
+                        poids=i[1]+k[1]+15
+                        route.append((2,i[2],i[0],k[2],poids))
+                        
+    return route
+
+def search3(stationstarted,stationended,route):
+    goal=stationended.get_name()
+    for i in stationstarted.get_neighbor():
+        for j in list_station:
+            if i[0]==j.get_name():
+                for k in j.get_neighbor():
+                    for l in list_station:
+                        if k[0]==l.get_name():
+                            for m in l.get_neighbor():
+                                if m[0]==goal:
+                                    poids=i[1]+k[1]+m[1]+30
+                                    route.append((3,i[2],i[0],k[2],k[0],m[2],poids))
+                        
+    return route
+
+def search4(stationstarted,stationended,route):
+    goal=stationended.get_name()
+    for i in stationstarted.get_neighbor():
+        for j in list_station:
+            if i[0]==j.get_name():
+                for k in j.get_neighbor():
+                    for l in list_station:
+                        if k[0]==l.get_name():
+                            for m in l.get_neighbor():
+                                for n in list_station:
+                                    if m[0]==n.get_name():
+                                        for p in n.get_neighbor():
+                                            if p[0]==goal:
+                                                poids=i[1]+k[1]+m[1]+p[1]+45
+                                                route.append((4,i[2],i[0],k[2],k[0],m[2],m[0],p[2],poids))
+                                        
+    return route
+  
 
 def achat():
     global charge
-    zonenumber=int(input("请输入乘坐区号\n"))
+    try:
+        zonenumber=int(input("请输入乘坐区号\n"))
+    except ValueError:
+        print("")    
     os.system("clear")    
     for i in prince_list:
         if i[0]==zonenumber:
-            reducedtype=int(input("优惠类型？\n 1 市民\t 2 学生\t 3 老人\t 4 游客\n"))
+            try:
+                reducedtype=int(input("优惠类型？\n 1 市民\t 2 学生\t 3 老人\t 4 游客 5 无优惠\n"))
+            except ValueError:
+                print("")                
+            reduced=1
             if reducedtype==1:
                 reduced=0.8
             if reducedtype==2:
@@ -439,7 +483,10 @@ def achat():
                 reduced=0.9
             newprice=i[1]*reduced
             print("票价为",round(newprice,1),"元")
-            ispayed=int(input("是否支付\n 1 确认\t 0 取消\n"))
+            try:
+                ispayed=int(input("是否支付\n 1 确认\t 0 取消\n"))
+            except ValueError:
+                print("")
             os.system("clear")
             if ispayed and charge>=round(newprice,1):
                 charge-=round(newprice,1)
@@ -467,58 +514,150 @@ def acount():
         print("无车票验证码")
     return
 
+
+def UIdisplay(results):
+    for i in list_station:
+        if results[0]==i.get_name() or results[0]==i.get_shortname():
+            stationstarted=i
+        if results[1]==i.get_name() or results[1]==i.get_shortname():
+            stationended=i
+    for k in list_line:
+        if k.get_numero()==results[7]:
+            linetemp=k
+    print(stationstarted.get_name(),"---->",stationended.get_name())
+    print(int(results[2]//60),":",int(results[2]%60),"+",int(results[3]//60),":",int(results[3]%60))
+    print(int(results[4]//60),":",int(results[4]%60),"---->",int(results[6]//60),":",int(results[6]%60))
+    print("")
+    print(results[7],"\t",results[-2])
+    print("")
+    isconnected=0
+    for j in results[5]:
+        for m in list_station:
+            if j==m.get_name():
+                if isconnected==1:
+                    #print("|")
+                    #drawline(results[5][results[5].index(j)-1],j,k)
+                    pass
+                print("*",m.get_zone(),"",j)
+                isconnected=1
+            #drawpoint(j,k,0)
+    print("")
+    
+def displayresults(route,startstation,endstation,ticketflag):
+    if route[0]==1:
+        results=searchroute(startstation,endstation,route[1],timenow,ticketflag)
+        if results:
+            UIdisplay(results)
+        else:
+            return 0
+    if route[0]==2:
+        results=searchroute(startstation,route[2],route[1],timenow,ticketflag)
+        if results: UIdisplay(results)
+        else:
+            return 0
+        results=searchroute(route[2],endstation,route[3],results[-4],results[-1])
+        if results: UIdisplay(results)
+        else:
+            return 0        
+    if route[0]==3:
+        results=searchroute(startstation,route[2],route[1],timenow,ticketflag)
+        if results: UIdisplay(results)
+        else:
+            return 0
+        results=searchroute(route[2],route[4],route[3],results[-4],results[-1])
+        if results: UIdisplay(results)
+        else:
+            return 0
+        results=searchroute(route[4],endstation,route[5],results[-4],results[-1])
+        if results:
+            UIdisplay(results)
+        else:
+            return 0
+    if route[0]==4:
+        results=searchroute(startstation,route[2],route[1],timenow,ticketflag)
+        if results: UIdisplay(results)
+        else: return 0
+        results=searchroute(route[2],route[4],route[3],results[-4],results[-1])
+        if results: UIdisplay(results)
+        else: return 0
+        results=searchroute(route[4],route[6],route[5],results[-4],results[-1])
+        if results: UIdisplay(results)
+        else: return 0                      
+        results=searchroute(route[6],endstation,route[7],results[-4],results[-1])
+        if results: UIdisplay(results)
+        else: return 0
+    print("")
+    ticketflag2 = list(set(results[-1]))
+    print("经过区间")
+    for i in ticketflag2:
+        print(i,end="")
+    print("\n")
+    print("到达时间"," ",int(results[6]//60),":",int(results[6]%60))
+    print("")    
+
+        
 def main():
     os.system("clear")
-    print(UseStyle('测试显示效果',mode='bold'))
     print("小浪底公交服务系统v1.3")  
     global linemap
     isended=0
     global timenow
     global issunday
     global charge
-    if int(input("系统时间？\n 1 是\t 0 否\n")):
+    try: systemtime=int(input("系统时间？\n 1 是\t 0 否\n"))
+    except ValueError:
+        print("")
+    if systemtime:
         hour=time.localtime().tm_hour
         minute=time.localtime().tm_min
         issunday=is_week_lastday()
     else:
         os.system("clear")
-        hour=int(input("小时\n"))
+        try: hour=int(input("小时\n"))
+        except ValueError:
+            print("")
         os.system("clear")
-        minute=int(input("分钟\n"))
+        try: minute=int(input("分钟\n"))
+        except ValueError:
+            print("")
         os.system("clear")
-        issunday=int(input("是星期天吗?\n 1 是\t 0 否\n"))
+        try: issunday=int(input("是星期天吗?\n 1 是\t 0 否\n"))
+        except ValueError:
+            print("")
     timenow=60*hour+minute
     for i in list_station:
         i.initialiser()
     charge=round(rd.randint(5,2000)/10,1)
     while(isended==0):
-        os.system("clear")        
+        os.system("clear")
+        if systemtime:
+            hour=time.localtime().tm_hour
+            minute=time.localtime().tm_min
+            issunday=is_week_lastday()
+            timenow=60*hour+minute
         print(int(hour),":",int(minute),end=" ")
         if issunday:
             print("星期天",end=" ")
         else:
             print("工作日",end=" ")
         print("余额 ",round(charge,1),"元")
-        print("0 退出",end="\n")
-        print("1 出发",end="\t")
-        print("2 购票",end="\t")        
-        print("3 线路",end="\t")
-        print("4 站点",end="\t")
-        print("5 账户",end="\t")
-        print("6 设置")
+        print("0 退出系统",end="\n")
+        print("1 路线查询",end="\t")
+        print("2 购票系统",end="\t")        
+        print("3 路号查询",end="\t")
+        print("4 候车查询",end="\t")
+        print("5 账户查询")
         option=-1
         while(option>10 or option<0):
-            option=int(input(""))
+            try:
+                option=int(input(""))
+            except ValueError:
+                print("")
             os.system("clear")
         if option==3:
             searchline()
         if option==4:
             searchstation()
-        if option==6:
-            hour=float(input("几点\n"))
-            minute=float(input("几分\n"))
-            timenow=60*hour+minute
-            issunday=int(input("是星期天吗?\n 1 是\t 0 否\n"))
         if option==5:
             acount()
         if option==2:
@@ -537,133 +676,145 @@ def main():
                     if endstation==i.get_name() or endstation==i.get_shortname():
                         stationended=i
                         get_station=1
-
-
-            print("|>>             |")
-            os.system("clear")
-            result=searchcomplex(stationended,stationstarted,3,[])
-            if result==False:
-                print("|>>>>>>>        |")            
+            route=[]
+            route=search1(stationstarted,stationended,route)
+            route=search2(stationstarted,stationended,route)
+            if len(route)<1:
+                route=search3(stationstarted,stationended,route)
+                if len(route)<1:
+                    route=search4(stationstarted,stationended,route)
+            route_sorted=sorted(route, key=lambda s: s[-1])
+            isendeded=0
+            if len(route_sorted)<1:
+                isendeded=1
+            order=0
+            while isendeded==0:
+                ticketflag=[]
+                displayresults(route_sorted[order],startstation,endstation,ticketflag)
+                print(order+1,"/",len(route_sorted))
+                try:
+                    signal=int(input("\n 0 退出\t 1 下一结果\t 2 上一结果\n"))
+                except ValueError:
+                    print("")
                 os.system("clear")                
-                result=searchcomplex(stationended,stationstarted,2,[])
-                if result==False:
-                    print("|>>>>>>>>>>>>   |")                                
-                    os.system("clear")
-                    result=searchcomplex(stationended,stationstarted,1,[])
-            print("|>>>>>>>>>>>>>> |")
-            os.system("clear")
-            result.reverse()
-            result.append(stationended.get_name())
-            timeensuite=timenow
-            ticketflag=[]
-            print("|>>>>>>>>>>>>>>>|")
-            os.system("clear")            
-            for i in range(len(result)-1):
-                print(result[i],"--->",result[i+1])
-                timeensuite=searchroute(result[i],result[i+1],timeensuite,ticketflag)
-                ticketflag2 = list(set(ticketflag))
-                print("\n")
-            print("区间")
-            for i in ticketflag2:
-                print(i,end="")
-                print("")
-            cv.imwrite('final.png', linemap)
+                if signal==0:
+                    isendeded=1
+                else:
+                    linemap=cv.imread("real.png")
+                if signal==1:
+                    order+=1
+                if signal==2:
+                    order-=1
+                if order>=len(route_sorted):
+                    order=len(route_sorted)-1
+                if order<0:
+                    order=0
 
+                
+                    
         if option==0:
             isended=1
         if isended==0:
-            isended=int(input("\n 0 返回\n"))
+            try:
+                isended=int(input("\n\n 0 返回\n"))
+            except ValueError:
+                print("")
 
 
+line6=busline(6,0,24,1,1.7,1,fast_normal_timetable,fast_sunday_timetable)
+line6.add_station(["聚龙里（外环）","聚龙","西门口","三标东","大桥西","大桥东"
+                   ,"食堂","三号楼东","一号楼东","一号楼","一号楼东","招待所","办公楼","红旗广场","小桥东"
+                   ,"小桥西","聚龙"])
+list_line.append(line6)
+
+line8=busline(8,0,24,1,1.6,1,fast_normal_timetable,fast_sunday_timetable)
+line8.add_station(["火车站里（外环）","火车站","食堂","大桥东","徐家汇","宾馆东","运动场东","办公楼"
+                   ,"红旗广场","小桥东","小桥西","聚龙","三标东","大桥西","火车站"
+                   ])
+list_line.append(line8)
+
+line11=busline(11,0,24,2,1.9,2,main_normal_timetable,middle_sunday_timetable)
+line11.add_station(["火车站","食堂","大桥东","徐家汇","宾馆东","运动场东","办公楼"
+                   "停车场东","小浪底大学","好又来","车队","车队桥西","加油站","景区北门","鑫苑名家"
+                   ])
+list_line.append(line11)
+
+line12=busline(12,0,24,1,1.4,1,fast_normal_timetable,fast_sunday_timetable)
+line12.add_station(["一号楼里（外环）","一号楼东","森林公园","办公楼","运动场东","宾馆东","徐家汇","大桥东","食堂","三号楼东","一号楼东"
+                   ])
+list_line.append(line12)
 
 
+line4=busline(4,0,24,2,2.4,2,main_normal_timetable,middle_sunday_timetable)
+line4.add_station(["桥沟","二标桥南","二标桥南","二标北门","二标宿舍","二标食堂","二标游泳池"
+                   ,"一标河西","一标东","大桥西","三标东","西门口","聚龙"
+                   ,"小桥西","建设银行","建设桥北","小浪底大学","好又来","车队"])
+list_line.append(line4)
 
-
-line1=busline(1,0,24,2,1.6,3,main_normal_timetable,middle_sunday_timetable)
+line1=busline(1,0,24,2,2.4,3,main_normal_timetable,middle_sunday_timetable)
 line1.add_station(["火车站","大桥东","食堂","三号楼东","一号楼东","招待所"
                    ,"办公楼","红旗广场","小桥东","停车场西","小浪底大学"
                    ,"好又来","车队","坝后公园","富士康南","海洋馆","东门","松山村"
                    ,"国道口","电厂","高铁站"])
 list_line.append(line1)
 
+line16=busline(16,5,23,2,2.4,2)
+line16.add_station(["车队","好又来","小浪底大学","停车场西","运动场西","宾馆大门","陈寨南","庙李南","老鸦陈南","大峪镇口","大峪镇经开中心","大峪镇十字街口","大峪镇人民路","大峪镇医院"])
+list_line.append(line16)
 
-line6=busline(6,0,24,1,1,1,fast_normal_timetable,fast_sunday_timetable)
-line6.add_station(["外环","聚龙","西门口","三标东","大桥西","大桥东"
-                   ,"食堂","四号楼东","三号楼东","二号楼东","一号楼东","一号楼","一号楼东","招待所","办公楼","红旗广场","小桥东"
-                   ,"小桥西","聚龙","内环"])
-list_line.append(line6)
 
-line8=busline(8,0,24,1,1,1,fast_normal_timetable,fast_sunday_timetable)
-line8.add_station(["外环","火车站","食堂","大桥东","徐家汇","宾馆东","运动场东","办公楼"
-                   ,"红旗广场","小桥东","小桥西","聚龙","三标东","大桥西","火车站","后勤部","内环"
+
+line85=busline(85,5,23,2,2.4,3)
+line85.add_station(["锅炉房","四标","森林公园","办公楼","停车场东","小浪底大学"
+                   ,"好又来","车队","坝后公园","富士康北","驾校","东门","松山村","国道口","电厂","高铁站"])
+list_line.append(line85)
+
+line20=busline(20,5,23,3,2.7,2)
+line20.add_station(["三角楼","桥沟中学","桥沟","一标游泳池","一标国际处","一标运动场","一标食堂","一标东","大桥西","大桥东","徐家汇","领导楼","洗衣房","宾馆西","宾馆"
                    ])
-list_line.append(line8)
+list_line.append(line20)
 
-line3=busline(3,0,24,3,1.8,2,main_normal_timetable,middle_sunday_timetable)
+line30=busline(30,5,23,3,2.2,2)
+line30.add_station(["桥沟","二标桥南","二标北门","二标宿舍","二标食堂","二标游泳池","一标河西","一标东","大桥西","大桥东","徐家汇","领导楼","运动场东","办公楼","一号楼西","三号楼西","三号楼"
+                   ])
+list_line.append(line30)
+
+line54=busline(54,5,23,1,1.9)
+line54.add_station(["一号楼","一号楼东","三号楼东","四号楼"               ,"食堂","大桥东","大桥西","一标东","一标食堂","一标运动场","一标国际处","一标游泳池","图书馆"])
+list_line.append(line54)
+
+line21=busline(21,5,23,3,2.2,2)
+line21.add_station(["桥沟","二标桥南","二标北门","二标宿舍","二标食堂","二标游泳池","一标游泳池","一标国际处","一标运动场","一标食堂","一标东","大桥西","大桥东","火车站"
+                   ])
+list_line.append(line21)
+
+line3=busline(3,0,24,3,2.1,2,main_normal_timetable,middle_sunday_timetable)
 line3.add_station(["桥沟","桥沟中学","三角楼","石家街","辛家庙","大峪镇口","老鸦陈"
                    ,"庙李","陈寨","宾馆大门","运动场西","小桥东","红旗广场","办公楼",
                    "停车场东","小浪底大学","好又来","车队"
                    ])
 list_line.append(line3)
 
-line4=busline(4,0,24,2,2,2,main_normal_timetable,middle_sunday_timetable)
-line4.add_station(["桥沟","二标桥南","二标桥南","二标北门","二标宿舍","二标食堂","二标游泳池"
-                   ,"一标河西","一标东","大桥西","三标东","西门口","聚龙"
-                   ,"小桥西","建设银行","建设桥北","小浪底大学","好又来","车队"])
-list_line.append(line4)
 
-line11=busline(11,0,24,2,1.3,2,main_normal_timetable,middle_sunday_timetable)
-line11.add_station(["火车站","食堂","大桥东","徐家汇","宾馆东","运动场东",
-                   "停车场东","小浪底大学","好又来","车队","车队桥西","加油站","景区北门","鑫苑名家"
-                   ])
-list_line.append(line11)
-
-line16=busline(16,5,22,2,2.1,2)
-line16.add_station(["车队","好又来","小浪底大学","停车场西","运动场西","宾馆大门","陈寨南","庙李南","老鸦陈南","大峪镇口","大峪镇经开中心","大峪镇十字街口","大峪镇人民路","大峪镇医院"])
-list_line.append(line16)
-
-line12=busline(12,0,24,1,1,1,fast_normal_timetable,fast_sunday_timetable)
-line12.add_station(["外环","一号楼东","森林公园","运动场东","宾馆东","徐家汇","大桥东","食堂","四号楼东","三号楼东","二号楼东","一号楼东","一号楼","内环"
-                   ])
-list_line.append(line12)
-
-line85=busline(85,5,22,2,1.9,3)
-line85.add_station(["锅炉房","四标","森林公园","停车场东","小浪底大学"
-                   ,"好又来","车队","坝后公园","富士康北","驾校","东门","松山村","国道口","电厂","高铁站"])
-list_line.append(line85)
-
-line20=busline(20,5,22,3,2.2,2)
-line20.add_station(["三角楼","桥沟中学","桥沟","一标游泳池","一标国际处","一标运动场","一标食堂","一标东","大桥西","大桥东","徐家汇","领导楼","洗衣房","宾馆西","宾馆"
-                   ])
-list_line.append(line20)
-
-line21=busline(21,5,22,3,2.2,2)
-line21.add_station(["桥沟","二标桥南","二标北门","二标宿舍","二标食堂","二标游泳池","一标游泳池","一标国际处","一标运动场","一标食堂","一标东","大桥西","大桥东","火车站"
-                   ])
-list_line.append(line21)
-
-line30=busline(30,5,22,3,2.2,2)
-line30.add_station(["桥沟","二标桥南","二标北门","二标宿舍","二标食堂","二标游泳池","一标河西","一标东","大桥西","大桥东","徐家汇","领导楼","运动场东","一号楼西","二号楼西","三号楼西","三号楼"
-                   ])
-list_line.append(line30)
-
-line42=busline(42,5,22,3,1.6,2)
+line42=busline(42,5,23,3,2.6,2)
 line42.add_station(["火车站","大桥东","徐家汇","宾馆东","宾馆","宾馆大门","陈寨南"
                    ,"庙李南","老鸦陈南","大峪镇口","辛家庙南","石家街南","三角楼","桥沟中学","桥沟"])
 list_line.append(line42)
 
-line95=busline(95,5,22,4,3.4,4)
+
+
+
+line95=busline(95,5,23,4,4.6,4)
 line95.add_station(["九曲桥","新桥西","新桥东","保税区","高铁站","旅游局","北岸小学"
                    ,"景区停车场西","景区停车场东","黄河大桥北","黄河大桥南","东和清口","东和清","机场东","机场"])
 list_line.append(line95)
 
-line7=busline(7,5,22,1,1.1)
-line7.add_station(["集装箱北","集装箱","集装箱南""三标东","菜市场","西门口","大桥西","大桥东","食堂","四号楼东"
-                   ,"三号楼东","二号楼东","一号楼东","四标","锅炉房"
+line7=busline(7,5,23,1,1.4)
+line7.add_station(["集装箱北","集装箱","集装箱南""三标东","菜市场","西门口","大桥西","大桥东","食堂","三号楼东","一号楼东","四标","锅炉房"
                    ])
 list_line.append(line7)
 
-line2=busline(2,5,22,1,1.2,1)
+line2=busline(2,5,23,1,1.9,1)
 line2.add_station(["火车站","大桥东","食堂","徐家汇","领导楼","洗衣房","宾馆西"
                    ,"宾馆大门","运动场西","小桥东","小桥西","聚龙","菜市场"
                    ,"集装箱南","集装箱","集装箱西"])
@@ -671,75 +822,72 @@ list_line.append(line2)
 
 
 
-line17=busline(17,5,22,1,1,1)
-line17.add_station(["外环","领导楼","大桥东","食堂","四号楼西","三号楼西","三号楼","三号楼东","二号楼东","一号楼东","招待所","运动场东","宾馆东","徐家汇","领导楼","领导楼内","内环"])
+line17=busline(17,5,23,1,1.7,1)
+line17.add_station(["宾馆西","洗衣房","领导楼","徐家汇","大桥东","食堂","三号楼西","三号楼","三号楼东","一号楼东","招待所","办公楼","运动场东","宾馆东","宾馆","宾馆大门","宾馆西"])
 list_line.append(line17)
 
 
-line26=busline(26,5,22,1,1.2,1)
-line26.add_station(["外环","火车站","食堂","四号楼西","三号楼西","二号楼西","一号楼西","一号楼","一号楼内""一号楼西","办公楼","红旗广场","东建材","运动场南","办公楼北","宾馆东","徐家汇","大桥东","火车站","内环"
+line26=busline(26,5,23,1,1.7,1)
+line26.add_station(["火车站里（外环）","火车站","食堂","三号楼西","一号楼西","一号楼","一号楼内""一号楼西","办公楼","红旗广场","东建材","运动场南","办公楼北","宾馆东","徐家汇","大桥东","火车站"
                    ])
 list_line.append(line26)
 
-line27=busline(27,5,22,1,1.3)
+line27=busline(27,5,23,1,1.5)
 line27.add_station(["锅炉房","四标","一号楼东","森林公园","办公楼","红旗广场","小桥东"
                    ,"小桥西","聚龙","西门口","三标东","三标游泳池","三标内"])
 list_line.append(line27)
 
 
-line50=busline(50,5,22,4,2.4)
+line50=busline(50,5,23,4,2.4)
 line50.add_station(["车队","思源学院","半坡","小浪底大学新区","东山宿舍楼","东山商城","白鹿原"
                    ])
 list_line.append(line50)
 
-line54=busline(54,5,22,1,1.7)
-line54.add_station(["一号楼","一号楼东","二号楼东","三号楼东","四号楼东","四号楼","四号楼西"
-                   ,"食堂","大桥东","大桥西","一标东","一标食堂","一标运动场","一标国际处","一标游泳池","图书馆"])
-list_line.append(line54)
 
-line56=busline(56,5,22,1,1.3)
+
+line56=busline(56,5,23,1.6,1.3)
 line56.add_station(["图书馆","一标游泳池","一标国际处","一标运动场","一标食堂","一标东","大桥西","三标东","西门口","聚龙"
                    ,"小桥西","小桥东","停车场西","小浪底大学","小浪底大学老区"])
 list_line.append(line56)
 
-line62=busline(62,5,22,3,1.5,2)
+line62=busline(62,5,23,3,2.3,2)
 line62.add_station(["大峪镇中学","大峪镇体育场","大峪镇邮局","大峪镇十字街口","大峪镇北客站","大峪镇大排档","大峪镇口"
                    ,"老鸦陈","老鸦陈三街","庙李三街","庙李一街","陈寨一街","陈寨","陈寨南","宾馆大门","运动场西","小桥东","小桥西","建设银行","建设桥北","小浪底大学","小浪底大学老区"])
 list_line.append(line62)
 
-line63=busline(63,5,22,3,1.5,3)
+line63=busline(63,5,23,3,2.1,3)
 line63.add_station(["大峪镇医院","大峪镇体育场","大峪镇邮局","大峪镇十字街口","大峪镇北客站","大峪镇大排档","大峪镇口"
         ,"辛家庙南","石家街南","三角楼","三角楼基地","桥沟北","桥沟新区中学","桥沟新区","二标桥南","二标北门","二标宿舍","二标食堂","二标游泳池","一标游泳池","图书馆"])
 list_line.append(line63)
 
-line64=busline(64,5,22,3,2.7,2)
+line64=busline(64,5,23,3,5.4,2)
 line64.add_station(["桐树岭","桐树岭东","柳林西","柳林","柳林东","桑园西","桑园东"
                    ,"二标北门","二标桥南","桥沟"])
 list_line.append(line64)
 
-line77=busline(77,5,22,2,1.9,3)
+line77=busline(77,5,23,2,3.3,3)
 line77.add_station(["加油站职工三区","加油站职工一区","加油站","车队桥西","车队","坝后公园","富士康北街"
                    ,"富士康中街","富士康南街","坝后公园南门","东岸观景台","转盘","东门","松山村","国道口","电厂","高铁站"])
 list_line.append(line77)
 
-line83=busline(83,5,22,2,1.3,1)
-line83.add_station(["内环","一号楼","一号楼西","办公楼","红旗广场","小桥东","运动场西"
-                   ,"宾馆大门","宾馆","宾馆职工楼","徐家汇","大桥东","食堂","四号楼西","三号楼西","二号楼西","二号楼","二号楼东","一号楼东","一号楼","一号楼内","外环"])
+line83=busline(83,5,23,2,1.6,1)
+line83.add_station(["一号楼里（外环）","一号楼","一号楼西","办公楼","红旗广场","小桥东","运动场西"
+                   ,"宾馆大门","宾馆","宾馆职工楼","徐家汇","大桥东","食堂","四号楼西","三号楼西","二号楼西","二号楼","一号楼东","一号楼"])
 list_line.append(line83)
 
 
 
-line91=busline(91,7,21,4,3.4,3,long_normal_timetable,long_sunday_timetable)
+line91=busline(91,5,22,4,4.3,3,long_normal_timetable,long_sunday_timetable)
 line91.add_station(["高铁站","电厂","国道口","西二旗","菜市口","一〇七基地","景区停车场东"
                    ,"黄河大桥北","黄河人家","河清口","泰山村西","泰山村"])
 list_line.append(line91)
 
-line18=busline(18,7,21,4,3.5,4,long_normal_timetable,long_sunday_timetable)
+line18=busline(18,5,22,4,4.5,4,long_normal_timetable,long_sunday_timetable)
 line18.add_station(["车队","车队桥西","加油站","景区北门","七号交通洞北","八号交通洞","七号交通洞南","微缩模型","西岸观景台","索桥西","索桥东","转盘","东门","松山村","国道口","电厂","高铁站"
                    ])
 list_line.append(line18)
 
-line19=busline(19,7,21,4,8.4,8,long_normal_timetable,long_sunday_timetable)
+line19=busline(19,5,22,4,12.4,8,long_normal_timetable,long_sunday_timetable)
 line19.add_station(["车队","车队桥西","加油站","景区北门","鑫苑名家","小坝","九号交通洞南","九号交通洞北","桐树岭","牛马潭","交叉口","小桥沟","桥沟新区","桥沟"
                    ])
 list_line.append(line19)
@@ -752,7 +900,7 @@ Station_info=[["火车站",594,492,1],
 ["三号楼东",605,567,1],
 ["一号楼东",588,607,1],
 ["招待所",561,627,1],
-["办公楼",494,651,1],
+["办公楼",515,661,1],
 ["红旗广场",465,658,1],
 ["小桥东",441,654,1],
 ["停车场西",432,697,1],
@@ -792,9 +940,6 @@ Station_info=[["火车站",594,492,1],
 ["西门口",449,578,1],
 ["建设银行",406,677,1],
 ["建设桥北",394,704,1],
-["外环",1,1,1],
-["四号楼东",609,542,1],
-["二号楼东",594,587,1],
 ["一号楼",572,607,1],
 ["内环",1,1,1],
 ["集装箱北",417,376,1],
@@ -824,7 +969,6 @@ Station_info=[["火车站",594,492,1],
 ["大峪镇十字街口",714,418,2],
 ["大峪镇人民路",713,456,2],
 ["大峪镇医院",712,503,2],
-["四号楼西",574,542,1],
 ["三号楼西",564,541,1],
 ["三号楼",585,562,1],
 ["领导楼内",546,533,1],
@@ -850,7 +994,6 @@ Station_info=[["火车站",594,492,1],
 ["一标食堂",542,402,1],
 ["宾馆",509,596,1],
 ["四号楼",590,542,1],
-["二号楼西",561,580,1],
 ["一号楼西",552,602,1],
 ["东建材",472,625,1],
 ["办公楼北",496,628,1],
@@ -875,9 +1018,9 @@ Station_info=[["火车站",594,492,1],
 ["庙李三街",618,458,1],
 ["庙李一街",581,492,1],
 ["陈寨一街",558,504,1],
-["三角楼基地",566,69,1],
-["桥沟北",505,33,1],
-["桥沟新区中学",482,70,1],
+["三角楼基地",566,69,2],
+["桥沟北",505,33,2],
+["桥沟新区中学",482,70,2],
 ["桐树岭东",20,270,4],
 ["柳林西",20,230,4],
 ["柳林",20,190,4],
@@ -945,8 +1088,6 @@ Station_short=[["火车站","hcz"],
 ["西门口","xmk"],
 ["三标东","sbd"],
 ["大桥西","dqx"],
-["四号楼东","shld"],
-["二号楼东","ehld"],
 ["一号楼","yhl"],
 ["小桥西","xqx"],
 ["内环","nh"],
@@ -1000,7 +1141,6 @@ Station_short=[["火车站","hcz"],
 ["宾馆西","bgx"],
 ["宾馆","bg"],
 ["一号楼西","yhlx"],
-["二号楼西","ehlx"],
 ["三号楼西","shlx"],
 ["三号楼","shl"],
 ["辛家庙南","xjmn"],
@@ -1025,7 +1165,6 @@ Station_short=[["火车站","hcz"],
 ["菜市场","csc"],
 ["集装箱南","jzxn"],
 ["集装箱西","jzxx"],
-["四号楼西","shlx"],
 ["领导楼内","ldln"],
 ["一号楼内一号楼西","yhlnyhlx"],
 ["东建材","djc"],
